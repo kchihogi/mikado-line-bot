@@ -23,3 +23,4 @@ Mikadoというラインボット。
 - django-phonenumber-field 6.3.0
 - django-phonenumbers 1.0.1
 - gunicorn 20.1.0
+- line-bot-sdk==2.3.0
