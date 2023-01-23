@@ -2,7 +2,6 @@
 """
 from django.apps import AppConfig
 
-
 class LineBotConfig(AppConfig):
     """An application configuration.
     """

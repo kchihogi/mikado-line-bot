@@ -1,28 +1,22 @@
 """Mikado Line Bot views.
 """
-import json
-
-# from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 
-
 from django.conf import settings
 
-from linebot import (
-    LineBotApi, WebhookHandler
-)
+from linebot import WebhookHandler
+
 from linebot.exceptions import (
     InvalidSignatureError
 )
+
 from linebot.models import (
-    MessageEvent, TextMessage, TextSendMessage,
+        MessageEvent, TextMessage
 )
 
-# from utils import message_creater
-# from line_bot.line_message import LineMessage
+from line_bot.line_events import MessageEventHandler
 
-line_bot_api = LineBotApi(settings.LINE_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(settings.LINE_CHANNEL_SECRET)
 
 @csrf_exempt
@@ -44,6 +38,6 @@ def index(request):
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text=event.message.text))
+    """MessageEvent
+    """
+    MessageEventHandler(event).replay()
