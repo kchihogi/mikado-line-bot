@@ -24,7 +24,7 @@ from django.conf import settings
 from linebot import LineBotApi
 
 from linebot.models import (
-    TextSendMessage, Event
+    Event, TextSendMessage
 )
 
 line_bot_api = LineBotApi(settings.LINE_CHANNEL_ACCESS_TOKEN)
@@ -68,9 +68,62 @@ class MessageEventHandler(EventHandler):
         EventBase (EventBase): EventBase class.
     """
 
+    def __init__(self, event: Event):
+        super().__init__(event)
+        self.send = None
+
     def replay(self):
         """replay message to user.
         """
         event = super().get_event()
         if "active" == super().get_mode():
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text=event.message.text))
+            line_bot_api.reply_message(event.reply_token, self.send)
+
+    def text_message_replay(self):
+        """make a response of user text message.
+        """
+        event = super().get_event()
+        self.send = TextSendMessage(text=event.message.text)
+        self.replay()
+
+    def image_message_replay(self):
+        """make a response of user image message.
+        """
+        # event = super().get_event()
+        self.send = TextSendMessage(text="image?")
+        self.replay()
+
+    def video_message_replay(self):
+        """make a response of user video message.
+        """
+        # event = super().get_event()
+        self.send = TextSendMessage(text="videoe?")
+        self.replay()
+
+    def audio_message_replay(self):
+        """make a response of user audio message.
+        """
+        # event = super().get_event()
+        self.send = TextSendMessage(text="audio?")
+        self.replay()
+
+    def file_message_replay(self):
+        """make a response of user file message.
+        """
+        # event = super().get_event()
+        self.send = TextSendMessage(text="file?")
+        self.replay()
+
+    def location_message_replay(self):
+        """make a response of user location message.
+        """
+        # event = super().get_event()
+        self.send = TextSendMessage(text="location?")
+        self.replay()
+
+    def sticker_message_replay(self):
+        """make a response of user sticker message.
+        """
+        # event = super().get_event()
+        self.send = TextSendMessage(text="sticker?")
+        self.replay()
