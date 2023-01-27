@@ -22,6 +22,7 @@ link: https://developers.line.biz/en/reference/messaging-api/#webhook-event-obje
 from django.conf import settings
 
 from linebot import LineBotApi
+from linebot.exceptions import LineBotApiError
 
 from linebot.models import (
     Event, TextSendMessage
@@ -36,6 +37,14 @@ class EventHandler():
         self.event = event
         self.type = event.type
         self.mode = event.mode #active/standby
+        self.send = None
+
+    def replay(self):
+        """replay message to user.
+        """
+        event = self.get_event()
+        if "active" == self.get_mode():
+            line_bot_api.reply_message(event.reply_token, self.send)
 
     def get_event(self):
         """get event
@@ -67,17 +76,6 @@ class MessageEventHandler(EventHandler):
     Args:
         EventBase (EventBase): EventBase class.
     """
-
-    def __init__(self, event: Event):
-        super().__init__(event)
-        self.send = None
-
-    def replay(self):
-        """replay message to user.
-        """
-        event = super().get_event()
-        if "active" == super().get_mode():
-            line_bot_api.reply_message(event.reply_token, self.send)
 
     def text_message_replay(self):
         """make a response of user text message.
@@ -127,3 +125,33 @@ class MessageEventHandler(EventHandler):
         # event = super().get_event()
         self.send = TextSendMessage(text="sticker?")
         self.replay()
+
+class FollowEventHandler(EventHandler):
+    """Follow and Unfollow event
+
+    Args:
+        EventBase (EventBase): EventBase class.
+    """
+
+    def follow_replay(self):
+        """make a response of user text message.
+        """
+        event = super().get_event()
+        try:
+            profile = line_bot_api.get_profile(event.source.user_id)
+            print(f"display_name:{profile.display_name}")
+            print(f"user_id:{profile.user_id}")
+            print(f"picture_url:{profile.picture_url}")
+            print(f"status_message:{profile.status_message}")
+            print(f"language:{profile.language}")
+            msg=f"{profile.display_name}さん、はじめまして。"
+            self.send = TextSendMessage(text=msg)
+            self.replay()
+        except LineBotApiError as err:
+            print(f"Message:{err.message}({err.status_code})")
+
+    def unfollow(self):
+        """make a response of user text message.
+        """
+        event = super().get_event()
+        print(f"unfollow envent. user:{event.source.user_id}")
